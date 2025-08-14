@@ -1,15 +1,19 @@
-FROM python:3.9.16-slim
+FROM python:3.11-slim
 
 WORKDIR /opt/app-root/src
 
 COPY requirements.txt /opt/app-root/src/
 
-## NOTE - rhel enforces user container permissions stronger ##
+## Install system dependencies
 USER root
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --upgrade pip==21.3.1
-
-RUN pip3 install -r requirements.txt
+## Upgrade pip and install requirements
+RUN pip3 install --upgrade pip
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 USER 1001
 
